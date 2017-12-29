@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>    
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"    
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">  
+<mapper namespace="com.liuyang.SSM.dao.UserDao">
+<!--设置entity类和数据库中表的字段一一对应--> 
+	<resultMap type="com.liuyang.SSM.entity.UserEntity" id="BaseResultMap">
+		<id column="USER_ID" property="userId" jdbcType="INTEGER"/>
+		<id column="USER_NAME" property="userName" jdbcType="VARCHAR"/>
+		<id column="USER_AGE" property="userAge" jdbcType="VARCHAR"/>
+		<id column="USER_EMAIL" property="userEmail" jdbcType="VARCHAR"/>
+		<id column="USER_PASSWORD" property="password" jdbcType="VARCHAR"/>
+	</resultMap>
+	
+	<sql id="Base_Column_List">
+		USER_ID,USER_NAME,USER_AGE,USER_EMAIL,USER_PASSWORD
+	</sql>
+	
+	<sql id="selectByParamsWhere">
+		<trim suffixOverrides="and | or">
+			<where>
+				<if test="userId != null">
+					USER_ID = #{userId,jdbcType=INTEGER} and
+				</if>
+				<if test="userName != null">
+					USER_NAME = #{userName,jdbcType=VARCHAR} and
+				</if>
+				<if test="userEmail != null">
+					USER_EMAIL = #{userEmail,jdbcType=VARCHAR} and
+				</if>
+				<if test="password != null">
+					USER_PASSWORD = #{password,jdbcType=VARCHAR} and
+				</if>
+				<if test="userAge != null">
+					USER_AGE = #{userAge,jdbcType=INTEGER} and
+				</if>
+			</where>
+		</trim>
+	</sql>
+	
+	<select id="seletUserEntityByPrimaryKey" parameterType="com.liuyang.SSM.entity.UserEntity" resultMap="BaseResultMap">
+		select
+		<include refid="Base_Column_List"/>
+		from ly_user
+		<include refid="selectByParamsWhere"/>
+	</select>
+	
+	<insert id="insertUserEntity" parameterType="java.util.List">
+		insert into ly_user 
+		(USER_ID,USER_NAME,USER_EMAIL,USER_PASSWORD,USER_AGE,CREATE_TIME)
+		values
+		<foreach collection="list" item="user" index="index" separator=",">
+			(
+			#{user.userId,jdbcType=INTEGER},
+			#{user.userName,jdbcType=VARCHAR},
+			#{user.userEmail,jdbcType=VARCHAR},
+			#{user.password,jdbcType=VARCHAR},
+			#{user.userAge,jdbcType=INTEGER},
+			now())
+		</foreach>
+	</insert>
+	
+	<delete id="deletUserEntityByPrimaryKey" parameterType="java.lang.Integer">
+		delete from ly_user
+		where USER_ID = #{userId,jdbcType=INTEGER}
+	</delete>
+
+	<update id="updateUserInfoByPrimaryKey" parameterType="com.liuyang.SSM.entity.UserEntity">
+		update ly_user
+		set USER_NAME = #{userName,jdbcType=VARCHAR},
+			USER_EMAIL = #{userEmail,jdbcType=VARCHAR},
+			USER_PASSWORD = #{password,jdbcType=VARCHAR},
+			USER_AGE = #{userAge,jdbcType=INTEGER}
+		where USER_ID = #{userId,jdbcType=INTEGER}
+	</update>
+	
+	<update id="updateUserInfoByPrimaryKeySelective" parameterType="com.liuyang.SSM.entity.UserEntity">
+		update ly_user
+		<set>
+			<if test="userName != null">
+			USER_NAME = #{userName,jdbcType=VARCHAR},
+			</if>
+			<if test="userEmail != null">
+			USER_EMAIL = #{userEmail,jdbcType=VARCHAR},
+			</if>
+			<if test="password != null">
+			USER_PASSWORD = #{password,jdbcType=VARCHAR},
+			</if>
+			<if test="userAge != null">
+			USER_AGE = #{userAge,jdbcType=INTEGER}
+			</if>
+		where USER_ID = #{userId,jdbcType=INTEGER}
+		</set>
+	</update>
+	
+	<select id="getUserEntityListBrParam" parameterType="java.util.Map" resultMap="BaseResultMap">
+		select 
+    	<include refid="Base_Column_List" />
+    	from ly_user
+    	<include refid="selectByParamsWhere"></include>
+    	ORDER BY
+    	USER_AGE ASC
+	</select>
+</mapper>
